@@ -22,7 +22,7 @@
     "/>
     <script src="json2.js"></script>
   </head> 
-  <body bgcolor="black" height="100%" width="100%"> 
+  <body bgcolor="#ECF39E" height="100%" width="100%"> 
     <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
     <script>
 var canvas = document.getElementById('c');
@@ -32,26 +32,25 @@ var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
 
 
-function sendJSONXMLHTTPRequest(url, objects, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState==4) {
-            try {
-                if (xhr.status==200) {
-                    //XXX: parse some JSON from the request!
-                    //XXX: Pass the data to the callback!
-                }
-            } 
-            catch(e) {
-                alert('Error: ' + e.name);
-            }
-        }
-    };
-    //XXX: POST to a URL
-    //XXX: set the mimetype and the accept headers!
-    // Remember to use application/json !
-}
-
+// function sendJSONXMLHTTPRequest(url, objects, callback) {
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function () {
+//         if (xhr.readyState==4) {
+//             try {
+//                 if (xhr.status==200) {
+//                     //XXX: parse some JSON from the request!
+//                     //XXX: Pass the data to the callback!
+//                 }
+//             } 
+//             catch(e) {
+//                 alert('Error: ' + e.name);
+//             }
+//         }
+//     };
+//     //XXX: POST to a URL
+//     //XXX: set the mimetype and the accept headers!
+//     // Remember to use application/json !
+//}
 
 world = {};
 
@@ -138,7 +137,16 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-
+    fetch("/entity/" + entity, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+    })
+    .then(response => console.log("Success:", JSON.stringify(response)))
+    .catch(error => console.error("Error:", error));
 }
 
 var counter = 0;
@@ -247,22 +255,27 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':'#132A13'});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'colour':'#31572C'});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+    addEntityWithoutName({'x':x,'y':y,'colour':'#4F772D',
                           'radius':10});
 });
 
 
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-    drawFrame();
+    fetch("/world").then(function(response) {
+        response.json().then(function(data) {
+            world = data;
+            drawNextFrame();
+        });
+    });
 }
 
 // 30 frames per second
