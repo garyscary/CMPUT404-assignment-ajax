@@ -82,7 +82,7 @@ function prepEntity(entity) {
 function clearFrame() {
     with(context) {
 	moveTo(0,0);
-	fillStyle = "#000";
+	fillStyle = "#ECF39E";
 	fillRect(0,0,W,H);
     }
 
@@ -276,6 +276,7 @@ function update() {
             drawNextFrame();
         });
     });
+    drawFrame();
 }
 
 // 30 frames per second
